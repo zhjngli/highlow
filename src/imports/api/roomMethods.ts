@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
-import { RoomsCollection, User } from '../db/rooms';
+import { RoomsCollection } from '../db/rooms';
+import { User } from '../db/users';
 
 function randomRoomHash(): string {
   let hash = '';
@@ -25,7 +26,7 @@ Meteor.methods({
     }
 
     const users: Array<User> = [];
-    users.push({ username: username });
+    users.push({ username: username, roomHash: roomHash });
 
     RoomsCollection.insert({
       hash: roomHash,
@@ -40,10 +41,25 @@ Meteor.methods({
       throw new Meteor.Error("can't join null room");
     }
     if (!username) {
-      throw new Meteor.Error('unknown user');
+      throw new Meteor.Error('username must be supplied');
     }
 
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
-    console.log(rooms);
+    if (rooms.length == 1) {
+      const room_id = rooms[0]._id;
+      RoomsCollection.update({ _id: room_id }, {
+        $addToSet: {
+          users: {
+            username: username,
+            roomHash: roomHash
+          }
+        }
+      });
+      return roomHash;
+    } else if (rooms.length == 0) {
+      throw new Meteor.Error(`could not find room with id: ${roomHash}`);
+    } else {
+      throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
+    }
   }
 });

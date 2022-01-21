@@ -1,8 +1,5 @@
 import { Mongo } from 'meteor/mongo';
-
-export interface User {
-  username: string;
-}
+import { User } from './users';
 
 export interface Room {
   _id?: string;
