@@ -3,6 +3,8 @@ import { Meteor } from 'meteor/meteor';
 import React, { SyntheticEvent } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { getPlayerId } from '/src/imports/api/session';
+
 type HomeProps = RouteComponentProps;
 
 type HomeState = {
@@ -33,12 +35,14 @@ class Home extends React.Component<HomeProps, HomeState> {
 
   createRoom(e: SyntheticEvent): void {
     e.preventDefault();
+
     const username = $(`form.${CREATE_ROOM_FORM}`).serializeArray()[0]['value'];
     if (!username) {
       alert('need a username!');
       return;
     }
-    Meteor.call('rooms.create', username, (err: Meteor.Error, res: string) => {
+
+    Meteor.call('rooms.create', getPlayerId(), username, (err: Meteor.Error, res: string) => {
       if (err) {
         alert(err);
       } else {
@@ -63,7 +67,7 @@ class Home extends React.Component<HomeProps, HomeState> {
       return;
     }
 
-    Meteor.call('rooms.join', roomHash, username, (err: Meteor.Error, res: string) => {
+    Meteor.call('rooms.join', roomHash, getPlayerId(), username, (err: Meteor.Error, res: string) => {
       if (err) {
         alert(err);
       } else {

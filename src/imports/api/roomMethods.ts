@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-import { Player } from '../db/players';
+import { Player, PlayersCollection } from '../db/players';
 import { RoomsCollection } from '../db/rooms';
 
 function randomRoomHash(): string {
@@ -13,7 +13,7 @@ function randomRoomHash(): string {
 }
 
 Meteor.methods({
-  'rooms.create'(username: string) {
+  'rooms.create'(playerId: string, username: string) {
     if (!username) {
       throw new Meteor.Error('username must be supplied');
     }
@@ -25,18 +25,23 @@ Meteor.methods({
       rooms = RoomsCollection.find({ hash: roomHash }).count();
     }
 
-    const players: Array<Player> = [];
-    players.push({ username: username, roomHash: roomHash });
+    const player: Player = {
+      _id: playerId,
+      username: username,
+      roomHash: roomHash
+    };
+
+    PlayersCollection.update({ _id: playerId }, { $set: player });
 
     RoomsCollection.insert({
       hash: roomHash,
       createdAt: new Date(),
-      players: players
+      players: [player]
     });
 
     return roomHash;
   },
-  'rooms.join'(roomHash: string, username: string) {
+  'rooms.join'(roomHash: string, playerId: string, username: string) {
     if (!roomHash) {
       throw new Meteor.Error("can't join null room");
     }
@@ -47,14 +52,20 @@ Meteor.methods({
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
     if (rooms.length == 1) {
       const roomId = rooms[0]._id;
+
+      const player: Player = {
+        _id: playerId,
+        username: username,
+        roomHash: roomHash
+      };
+
+      PlayersCollection.update({ _id: playerId }, { $set: player });
+
       RoomsCollection.update(
         { _id: roomId },
         {
           $addToSet: {
-            players: {
-              username: username,
-              roomHash: roomHash
-            }
+            players: player
           }
         }
       );

@@ -7,5 +7,12 @@ import App from '../imports/ui/app';
 
 Meteor.startup(() => {
   render(<App />, document.getElementById('react-target'));
-  setPlayerId(Meteor.call('player.create', ''));
+
+  Meteor.call('player.create', '', (err: Meteor.Error, res: string) => {
+    if (err) {
+      alert(err);
+    } else {
+      setPlayerId(res);
+    }
+  });
 });
