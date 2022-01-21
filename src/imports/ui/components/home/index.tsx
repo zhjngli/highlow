@@ -50,7 +50,6 @@ class Home extends React.Component<HomeProps, HomeState> {
   joinRoom(e: SyntheticEvent): void {
     e.preventDefault();
     const formData = $(`form.${JOIN_ROOM_FORM}`).serializeArray();
-    console.log(formData);
     
     const username = formData[0]['value'];
     if (!username) {
@@ -64,9 +63,9 @@ class Home extends React.Component<HomeProps, HomeState> {
       return;
     }
 
-    Meteor.call('rooms.join', roomHash, username, (err: any, res: string) => {
+    Meteor.call('rooms.join', roomHash, username, (err: Meteor.Error, res: string) => {
       if (err) {
-        alert(err);
+        alert(err.reason);
       } else {
         this.props.history.push(`/r/${res}`);
       }

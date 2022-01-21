@@ -20,12 +20,12 @@ class RoomUI extends React.Component<RoomUIProps> {
 
   render(): React.ReactElement {
     if (this.props.room) {
-      const users = this.props.room.users;
+      const players = this.props.room.players;
       return (
         <div>
           <ul>
-            {users.map(user => (
-              <li>{user.username} is in the room.</li>
+            {players.map(player => (
+              <li key={player._id}>{player.username} is in the room.</li>
             ))}
           </ul>
         </div>

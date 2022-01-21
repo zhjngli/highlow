@@ -1,11 +1,11 @@
 import { Mongo } from 'meteor/mongo';
-import { User } from './users';
+import { Player } from './players';
 
 export interface Room {
   _id?: string;
   hash: string;
   createdAt: Date;
-  users: Array<User>;
+  players: Array<Player>;
 }
 
 export const RoomsCollection = new Mongo.Collection<Room>('rooms');

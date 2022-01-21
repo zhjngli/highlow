@@ -1,4 +1,5 @@
 import '../imports/api/roomMethods';
+import '../imports/api/playerMethods';
 
 import { Meteor } from 'meteor/meteor';
 
