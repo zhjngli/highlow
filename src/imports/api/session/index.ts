@@ -1,6 +1,6 @@
 import { Session } from 'meteor/session';
 
-const PLAYER_ID: string = 'PLAYER_ID';
+const PLAYER_ID = 'PLAYER_ID';
 
 export function setPlayerId(id: string): void {
   Session.set(PLAYER_ID, id);

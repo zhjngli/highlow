@@ -1,4 +1,5 @@
 import { Mongo } from 'meteor/mongo';
+
 import { Player } from './players';
 
 export interface Room {

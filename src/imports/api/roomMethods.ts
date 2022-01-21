@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
-import { RoomsCollection } from '../db/rooms';
 import { Player } from '../db/players';
+import { RoomsCollection } from '../db/rooms';
 
 function randomRoomHash(): string {
   let hash = '';
@@ -47,14 +47,17 @@ Meteor.methods({
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
     if (rooms.length == 1) {
       const roomId = rooms[0]._id;
-      RoomsCollection.update({ _id: roomId }, {
-        $addToSet: {
-          players: {
-            username: username,
-            roomHash: roomHash
+      RoomsCollection.update(
+        { _id: roomId },
+        {
+          $addToSet: {
+            players: {
+              username: username,
+              roomHash: roomHash
+            }
           }
         }
-      });
+      );
       return roomHash;
     } else if (rooms.length == 0) {
       throw new Meteor.Error(`could not find room with id: ${roomHash}`);

@@ -1,7 +1,7 @@
+import $ from 'jquery';
 import { Meteor } from 'meteor/meteor';
 import React, { SyntheticEvent } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import $ from "jquery";
 
 type HomeProps = RouteComponentProps;
 
@@ -38,7 +38,7 @@ class Home extends React.Component<HomeProps, HomeState> {
       alert('need a username!');
       return;
     }
-    Meteor.call('rooms.create', username, (err: any, res: string) => {
+    Meteor.call('rooms.create', username, (err: Meteor.Error, res: string) => {
       if (err) {
         alert(err);
       } else {
@@ -50,13 +50,13 @@ class Home extends React.Component<HomeProps, HomeState> {
   joinRoom(e: SyntheticEvent): void {
     e.preventDefault();
     const formData = $(`form.${JOIN_ROOM_FORM}`).serializeArray();
-    
+
     const username = formData[0]['value'];
     if (!username) {
       alert('need a username!');
       return;
     }
-    
+
     const roomHash = formData[1]['value'];
     if (!roomHash) {
       alert('need a room id!');
@@ -65,7 +65,7 @@ class Home extends React.Component<HomeProps, HomeState> {
 
     Meteor.call('rooms.join', roomHash, username, (err: Meteor.Error, res: string) => {
       if (err) {
-        alert(err.reason);
+        alert(err);
       } else {
         this.props.history.push(`/r/${res}`);
       }
@@ -90,27 +90,15 @@ class Home extends React.Component<HomeProps, HomeState> {
         </p>
         <p>Create a room!</p>
         <form className={CREATE_ROOM_FORM} onSubmit={this.createRoom}>
-          <input
-            type="text"
-            placeholder="choose a username"
-            name="username"
-          />
+          <input type="text" placeholder="choose a username" name="username" />
 
           <button type="submit">Create room</button>
         </form>
         <hr />
         <p>or, join a room!</p>
         <form className={JOIN_ROOM_FORM} onSubmit={this.joinRoom}>
-        <input
-            type="text"
-            placeholder="choose a username"
-            name="username"
-          />
-          <input
-            type="text"
-            placeholder="room id"
-            name="roomId"
-          />
+          <input type="text" placeholder="choose a username" name="username" />
+          <input type="text" placeholder="room id" name="roomId" />
 
           <button type="submit">Join room</button>
         </form>
