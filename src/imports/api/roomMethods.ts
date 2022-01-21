@@ -36,7 +36,7 @@ Meteor.methods({
     RoomsCollection.insert({
       hash: roomHash,
       createdAt: new Date(),
-      players: [player]
+      playerIds: [playerId]
     });
 
     return roomHash;
@@ -48,6 +48,7 @@ Meteor.methods({
     if (!username) {
       throw new Meteor.Error('username must be supplied');
     }
+    console.log(`player when joining room: ${playerId}, ${username}, ${roomHash}`);
 
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
     if (rooms.length == 1) {
@@ -65,7 +66,7 @@ Meteor.methods({
         { _id: roomId },
         {
           $addToSet: {
-            players: player
+            playerIds: playerId
           }
         }
       );
