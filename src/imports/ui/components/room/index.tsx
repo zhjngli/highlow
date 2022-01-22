@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { getPlayerId } from '/src/imports/api/session';
 
 import { Player, PlayersCollection } from '/src/imports/db/players';
 import { Room, RoomsCollection } from '/src/imports/db/rooms';
@@ -19,6 +20,19 @@ type RoomUIProps = RoomProps & RoomRouteProps;
 class RoomUI extends React.Component<RoomUIProps> {
   constructor(props: RoomUIProps) {
     super(props);
+
+    this.leaveRoom = this.leaveRoom.bind(this);
+  }
+
+  leaveRoom(e: React.MouseEvent): void {
+    e.preventDefault();
+    Meteor.call('rooms.leave', this.props.room.hash, getPlayerId(), (err: Meteor.Error, _: string) => {
+      if (err) {
+        alert(err);
+      } else {
+        this.props.history.push(`/`);
+      }
+    });
   }
 
   render(): React.ReactElement {
@@ -30,6 +44,7 @@ class RoomUI extends React.Component<RoomUIProps> {
               <li key={player._id}>{player.username} is in the room.</li>
             ))}
           </ul>
+          <button onClick={this.leaveRoom}>leave room</button>
         </div>
       );
     }
