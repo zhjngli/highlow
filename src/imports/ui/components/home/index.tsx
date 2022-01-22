@@ -36,7 +36,7 @@ class Home extends React.Component<HomeProps, HomeState> {
   createRoom(e: SyntheticEvent): void {
     e.preventDefault();
 
-    const username = $(`form.${CREATE_ROOM_FORM}`).serializeArray()[0]['value'];
+    const username = $(`form.${CREATE_ROOM_FORM}`).serializeArray()[0]['value'].trim();
     if (!username) {
       alert('need a username!');
       return;
@@ -55,13 +55,13 @@ class Home extends React.Component<HomeProps, HomeState> {
     e.preventDefault();
     const formData = $(`form.${JOIN_ROOM_FORM}`).serializeArray();
 
-    const username = formData[0]['value'];
+    const username = formData[0]['value'].trim();
     if (!username) {
       alert('need a username!');
       return;
     }
 
-    const roomHash = formData[1]['value'];
+    const roomHash = formData[1]['value'].trim();
     if (!roomHash) {
       alert('need a room id!');
       return;
