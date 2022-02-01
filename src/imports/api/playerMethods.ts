@@ -5,7 +5,8 @@ import { PlayersCollection } from '../db/players';
 Meteor.methods({
   'player.create'(username: string) {
     const playerId: string = PlayersCollection.insert({
-      username: username
+      username: username,
+      createdAt: new Date()
     });
     return playerId;
   }

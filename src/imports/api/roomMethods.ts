@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-import { Player, PlayersCollection } from '../db/players';
+import { PlayersCollection } from '../db/players';
 import { RoomsCollection } from '../db/rooms';
 
 function randomRoomHash(): string {
@@ -25,13 +25,7 @@ Meteor.methods({
       rooms = RoomsCollection.find({ hash: roomHash }).count();
     }
 
-    const player: Player = {
-      _id: playerId,
-      username: username,
-      roomHash: roomHash
-    };
-
-    PlayersCollection.update({ _id: playerId }, { $set: player });
+    PlayersCollection.update({ _id: playerId }, { $set: { username: username, roomHash: roomHash } });
 
     RoomsCollection.insert({
       hash: roomHash,
@@ -54,13 +48,7 @@ Meteor.methods({
     if (rooms.length == 1) {
       const roomId = rooms[0]._id;
 
-      const player: Player = {
-        _id: playerId,
-        username: username,
-        roomHash: roomHash
-      };
-
-      PlayersCollection.update({ _id: playerId }, { $set: player });
+      PlayersCollection.update({ _id: playerId }, { $set: { username: username, roomHash: roomHash } });
 
       RoomsCollection.update(
         { _id: roomId },

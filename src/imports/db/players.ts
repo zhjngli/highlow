@@ -3,6 +3,7 @@ import { Mongo } from 'meteor/mongo';
 export interface Player {
   _id?: string;
   username: string;
+  createdAt: Date;
   roomHash?: string;
 }
 
