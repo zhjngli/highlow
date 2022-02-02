@@ -1,4 +1,5 @@
 import { Mongo } from 'meteor/mongo';
+
 import { User } from './users';
 
 export interface Player {

@@ -1,11 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 
 import { GamesCollection, Player } from '../db/games';
-import { User } from '../db/users';
 import { RoomsCollection } from '../db/rooms';
+import { User } from '../db/users';
 
 function randomCard(): number {
-  const cards = [2,3,4,5,6,7,8,9];
+  const cards = [2, 3, 4, 5, 6, 7, 8, 9];
   return cards[Math.floor(Math.random() * cards.length)];
 }
 
@@ -15,11 +15,11 @@ Meteor.methods({
       throw new Meteor.Error('there must be at least one user to start a game');
     }
 
-    let players: Array<Player> = users.map((user) => ({
+    const players: Array<Player> = users.map((user) => ({
       user: user,
       card: randomCard()
     }));
-    
+
     const gameId: string = GamesCollection.insert({
       createdAt: new Date(),
       roomHash: roomHash,

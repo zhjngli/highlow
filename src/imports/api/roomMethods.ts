@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
-import { UsersCollection } from '../db/users';
 import { RoomsCollection } from '../db/rooms';
+import { UsersCollection } from '../db/users';
 
 function randomRoomHash(): string {
   let hash = '';
@@ -77,10 +77,7 @@ Meteor.methods({
 
       UsersCollection.update({ _id: userId }, { $unset: { roomHash: '' } });
 
-      RoomsCollection.update(
-        { _id: roomId },
-        { $pull: { userIds: userId } }
-      );
+      RoomsCollection.update({ _id: roomId }, { $pull: { userIds: userId } });
     } else if (rooms.length == 0) {
       throw new Meteor.Error(`could not find room with id: ${roomHash}`);
     } else {

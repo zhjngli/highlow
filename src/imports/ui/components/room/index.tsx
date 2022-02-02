@@ -2,11 +2,12 @@ import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import GameUI from '../game';
-import { getUserId } from '/src/imports/api/session';
 
-import { User, UsersCollection } from '/src/imports/db/users';
+import { getUserId } from '/src/imports/api/session';
 import { Room, RoomsCollection } from '/src/imports/db/rooms';
+import { User, UsersCollection } from '/src/imports/db/users';
+
+import GameUI from '../game';
 
 type RoomRouteProps = RouteComponentProps<{ hash: string }>;
 

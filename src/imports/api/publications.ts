@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
 import { GamesCollection } from '../db/games';
-import { UsersCollection } from '../db/users';
 import { RoomsCollection } from '../db/rooms';
+import { UsersCollection } from '../db/users';
 
 Meteor.publish('rooms', function publishRooms(roomHash: string) {
   return RoomsCollection.find({ hash: roomHash });
