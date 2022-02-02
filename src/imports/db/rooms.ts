@@ -5,6 +5,7 @@ export interface Room {
   hash: string;
   createdAt: Date;
   playerIds: Array<string>;
+  gameId?: string;
 }
 
 export const RoomsCollection = new Mongo.Collection<Room>('rooms');

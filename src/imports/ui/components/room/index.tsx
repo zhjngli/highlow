@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import GameUI from '../game';
 import { getPlayerId } from '/src/imports/api/session';
 
 import { Player, PlayersCollection } from '/src/imports/db/players';
@@ -22,6 +23,7 @@ class RoomUI extends React.Component<RoomUIProps> {
     super(props);
 
     this.leaveRoom = this.leaveRoom.bind(this);
+    this.startGame = this.startGame.bind(this);
   }
 
   leaveRoom(e: React.MouseEvent): void {
@@ -35,7 +37,16 @@ class RoomUI extends React.Component<RoomUIProps> {
     });
   }
 
-  render(): React.ReactElement {
+  startGame(e: React.MouseEvent): void {
+    e.preventDefault();
+    Meteor.call('games.create', this.props.room.hash, this.props.players, (err: Meteor.Error, _: string) => {
+      if (err) {
+        alert(err);
+      }
+    });
+  }
+
+  renderLobby(): React.ReactElement {
     if (this.props.room && this.props.players) {
       return (
         <div>
@@ -45,6 +56,7 @@ class RoomUI extends React.Component<RoomUIProps> {
             ))}
           </ul>
           <button onClick={this.leaveRoom}>leave room</button>
+          <button onClick={this.startGame}>start game</button>
         </div>
       );
     }
@@ -53,6 +65,13 @@ class RoomUI extends React.Component<RoomUIProps> {
         <p>couldn&apos;t find room: {this.props.hash}!</p>
       </div>
     );
+  }
+
+  render(): React.ReactElement {
+    if (this.props.room?.gameId) {
+      return <GameUI roomHash={this.props.hash} gameId={this.props.room.gameId} />;
+    }
+    return this.renderLobby();
   }
 }
 
