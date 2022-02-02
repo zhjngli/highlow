@@ -4,7 +4,7 @@ export interface Room {
   _id?: string;
   hash: string;
   createdAt: Date;
-  playerIds: Array<string>;
+  userIds: Array<string>;
   gameId?: string;
 }
 

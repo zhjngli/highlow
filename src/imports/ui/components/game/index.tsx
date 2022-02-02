@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
-import { getPlayerId } from '/src/imports/api/session';
-import { GamesCollection, PlayerCard } from '/src/imports/db/games';
+import { getUserId } from '/src/imports/api/session';
+import { GamesCollection, Player } from '/src/imports/db/games';
 
 type GameProps = {
   roomHash: string;
@@ -10,8 +10,8 @@ type GameProps = {
 }
 
 type GameTrackerProps = {
-  playerCards: Array<PlayerCard>;
-  self: PlayerCard
+  players: Array<Player>;
+  self: Player
 };
 
 type GameUIProps = GameProps & GameTrackerProps;
@@ -40,12 +40,12 @@ class GameUI extends React.Component<GameUIProps, GameState> {
     return (
       <div>
         <ul>
-          {this.props.playerCards.map(({ player, card }) =>
+          {this.props.players.map(({ user, card }) =>
           (
-             <li key={player._id}>{player.username} is holding {card}.</li>)
+             <li key={user._id}>{user.username} is holding {card}.</li>)
           )}
           <hr />
-          {this.state.revealed && <li key={this.props.self.player._id}>{this.props.self.player.username} is holding {this.props.self.card}.</li>}
+          {this.state.revealed && <li key={this.props.self.user._id}>{this.props.self.user.username} is holding {this.props.self.card}.</li>}
         </ul>
         {!this.state.revealed && <button onClick={this.revealCard}>reveal card</button>}
       </div>
@@ -61,14 +61,14 @@ export default withTracker(function (props: GameProps) {
 
   if (games.length == 1) {
     return {
-      playerCards: games[0].cards.filter(({ player }) => (player._id != getPlayerId())),
-      self: games[0].cards.filter(({ player }) => (player._id == getPlayerId()))[0]
+      players: games[0].players.filter(({ user }) => (user._id != getUserId())),
+      self: games[0].players.filter(({ user }) => (user._id == getUserId()))[0]
     };
   } else {
     // too many games (shouldn't ever happen), or game doesn't exist
     return {
-      playerCards: [],
-      self: { player: { username: '', createdAt: new Date() }, card: 0 }
+      players: [],
+      self: { user: { username: '', createdAt: new Date() }, card: 0 }
     };
   }
 })(GameUI);

@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-import { PlayersCollection } from '../db/players';
+import { UsersCollection } from '../db/users';
 import { RoomsCollection } from '../db/rooms';
 
 function randomRoomHash(): string {
@@ -13,7 +13,7 @@ function randomRoomHash(): string {
 }
 
 Meteor.methods({
-  'rooms.create'(playerId: string, username: string) {
+  'rooms.create'(userId: string, username: string) {
     if (!username) {
       throw new Meteor.Error('username must be supplied');
     }
@@ -25,36 +25,36 @@ Meteor.methods({
       rooms = RoomsCollection.find({ hash: roomHash }).count();
     }
 
-    PlayersCollection.update({ _id: playerId }, { $set: { username: username, roomHash: roomHash } });
+    UsersCollection.update({ _id: userId }, { $set: { username: username, roomHash: roomHash } });
 
     RoomsCollection.insert({
       hash: roomHash,
       createdAt: new Date(),
-      playerIds: [playerId]
+      userIds: [userId]
     });
 
     return roomHash;
   },
-  'rooms.join'(roomHash: string, playerId: string, username: string) {
+  'rooms.join'(roomHash: string, userId: string, username: string) {
     if (!roomHash) {
       throw new Meteor.Error("can't join null room");
     }
     if (!username) {
       throw new Meteor.Error('username must be supplied');
     }
-    console.log(`player when joining room: ${playerId}, ${username}, ${roomHash}`);
+    console.log(`user when joining room: ${userId}, ${username}, ${roomHash}`);
 
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
     if (rooms.length == 1) {
       const roomId = rooms[0]._id;
 
-      PlayersCollection.update({ _id: playerId }, { $set: { username: username, roomHash: roomHash } });
+      UsersCollection.update({ _id: userId }, { $set: { username: username, roomHash: roomHash } });
 
       RoomsCollection.update(
         { _id: roomId },
         {
           $addToSet: {
-            playerIds: playerId
+            userIds: userId
           }
         }
       );
@@ -65,21 +65,21 @@ Meteor.methods({
       throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
     }
   },
-  'rooms.leave'(roomHash: string, playerId: string) {
+  'rooms.leave'(roomHash: string, userId: string) {
     if (!roomHash) {
       throw new Meteor.Error("can't leave null room");
     }
-    console.log(`player leaving room: ${playerId}, ${roomHash}`);
+    console.log(`user leaving room: ${userId}, ${roomHash}`);
 
     const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
     if (rooms.length == 1) {
       const roomId = rooms[0]._id;
 
-      PlayersCollection.update({ _id: playerId }, { $unset: { roomHash: '' } });
+      UsersCollection.update({ _id: userId }, { $unset: { roomHash: '' } });
 
       RoomsCollection.update(
         { _id: roomId },
-        { $pull: { playerIds: playerId } }
+        { $pull: { userIds: userId } }
       );
     } else if (rooms.length == 0) {
       throw new Meteor.Error(`could not find room with id: ${roomHash}`);

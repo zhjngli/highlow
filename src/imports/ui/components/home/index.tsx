@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import React, { SyntheticEvent } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { getPlayerId } from '/src/imports/api/session';
+import { getUserId } from '/src/imports/api/session';
 
 type HomeProps = RouteComponentProps;
 
@@ -42,7 +42,7 @@ class Home extends React.Component<HomeProps, HomeState> {
       return;
     }
 
-    Meteor.call('rooms.create', getPlayerId(), username, (err: Meteor.Error, res: string) => {
+    Meteor.call('rooms.create', getUserId(), username, (err: Meteor.Error, res: string) => {
       if (err) {
         alert(err);
       } else {
@@ -67,7 +67,7 @@ class Home extends React.Component<HomeProps, HomeState> {
       return;
     }
 
-    Meteor.call('rooms.join', roomHash, getPlayerId(), username, (err: Meteor.Error, res: string) => {
+    Meteor.call('rooms.join', roomHash, getUserId(), username, (err: Meteor.Error, res: string) => {
       if (err) {
         alert(err);
       } else {

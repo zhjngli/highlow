@@ -3,9 +3,9 @@ import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import GameUI from '../game';
-import { getPlayerId } from '/src/imports/api/session';
+import { getUserId } from '/src/imports/api/session';
 
-import { Player, PlayersCollection } from '/src/imports/db/players';
+import { User, UsersCollection } from '/src/imports/db/users';
 import { Room, RoomsCollection } from '/src/imports/db/rooms';
 
 type RoomRouteProps = RouteComponentProps<{ hash: string }>;
@@ -13,7 +13,7 @@ type RoomRouteProps = RouteComponentProps<{ hash: string }>;
 type RoomProps = {
   hash: string;
   room: Room;
-  players?: Array<Player>;
+  users?: Array<User>;
 };
 
 type RoomUIProps = RoomProps & RoomRouteProps;
@@ -28,7 +28,7 @@ class RoomUI extends React.Component<RoomUIProps> {
 
   leaveRoom(e: React.MouseEvent): void {
     e.preventDefault();
-    Meteor.call('rooms.leave', this.props.room.hash, getPlayerId(), (err: Meteor.Error, _: string) => {
+    Meteor.call('rooms.leave', this.props.room.hash, getUserId(), (err: Meteor.Error, _: string) => {
       if (err) {
         alert(err);
       } else {
@@ -39,7 +39,7 @@ class RoomUI extends React.Component<RoomUIProps> {
 
   startGame(e: React.MouseEvent): void {
     e.preventDefault();
-    Meteor.call('games.create', this.props.room.hash, this.props.players, (err: Meteor.Error, _: string) => {
+    Meteor.call('games.create', this.props.room.hash, this.props.users, (err: Meteor.Error, _: string) => {
       if (err) {
         alert(err);
       }
@@ -47,12 +47,12 @@ class RoomUI extends React.Component<RoomUIProps> {
   }
 
   renderLobby(): React.ReactElement {
-    if (this.props.room && this.props.players) {
+    if (this.props.room && this.props.users) {
       return (
         <div>
           <ul>
-            {this.props.players.map((player) => (
-              <li key={player._id}>{player.username} is in the room.</li>
+            {this.props.users.map((user) => (
+              <li key={user._id}>{user.username} is in the room.</li>
             ))}
           </ul>
           <button onClick={this.leaveRoom}>leave room</button>
@@ -78,22 +78,22 @@ class RoomUI extends React.Component<RoomUIProps> {
 export default withTracker(function (props: RoomRouteProps) {
   const roomHash = props.match.params.hash;
   Meteor.subscribe('rooms', roomHash);
-  Meteor.subscribe('players', roomHash);
+  Meteor.subscribe('users', roomHash);
 
   const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
-  const players = PlayersCollection.find({ roomHash: roomHash }).fetch();
+  const users = UsersCollection.find({ roomHash: roomHash }).fetch();
 
   if (rooms.length == 1) {
     return {
       hash: roomHash,
       room: rooms[0],
-      players: players
+      users: users
     };
   } else {
     // too many rooms (shouldn't ever happen), or room doesn't exist
     return {
       hash: roomHash,
-      room: { hash: roomHash, createdAt: new Date(), playerIds: [''] }
+      room: { hash: roomHash, createdAt: new Date(), userIds: [''] }
     };
   }
 })(RoomUI);

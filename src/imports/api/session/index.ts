@@ -1,12 +1,12 @@
 import { Session } from 'meteor/session';
 
-const PLAYER_ID = 'PLAYER_ID';
+const USER_ID = 'USER_ID';
 
-export function setPlayerId(id: string): void {
-  Session.set(PLAYER_ID, id);
-  console.log(`player id: ${id}`);
+export function setUserId(id: string): void {
+  Session.set(USER_ID, id);
+  console.log(`user id: ${id}`);
 }
 
-export function getPlayerId(): string {
-  return Session.get(PLAYER_ID);
+export function getUserId(): string {
+  return Session.get(USER_ID);
 }

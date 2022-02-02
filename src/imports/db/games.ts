@@ -1,8 +1,8 @@
 import { Mongo } from 'meteor/mongo';
-import { Player } from './players';
+import { User } from './users';
 
-export interface PlayerCard {
-  player: Player;
+export interface Player {
+  user: User;
   card: number;
 }
 
@@ -10,7 +10,7 @@ export interface Game {
   _id?: string;
   createdAt: Date;
   roomHash: string;
-  cards: Array<PlayerCard>;
+  players: Array<Player>;
 }
 
 export const GamesCollection = new Mongo.Collection<Game>('games');
