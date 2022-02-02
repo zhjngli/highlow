@@ -28,6 +28,7 @@ class GameUI extends React.Component<GameUIProps, GameState> {
     this.state = { revealed: false };
 
     this.revealCard = this.revealCard.bind(this);
+    this.toLobby = this.toLobby.bind(this);
   }
 
   revealCard(e: React.MouseEvent): void {
@@ -35,6 +36,15 @@ class GameUI extends React.Component<GameUIProps, GameState> {
     this.setState((_prevState: GameState) => ({
       revealed: true
     }));
+  }
+
+  toLobby(e: React.MouseEvent): void {
+    e.preventDefault();
+    Meteor.call('games.quit', this.props.roomHash, this.props.gameId, (err: Meteor.Error, _: string) => {
+      if (err) {
+        alert(err);
+      }
+    });
   }
 
   render(): React.ReactElement {
@@ -54,6 +64,7 @@ class GameUI extends React.Component<GameUIProps, GameState> {
           )}
         </ul>
         {!this.state.revealed && <button onClick={this.revealCard}>reveal card</button>}
+        <button onClick={this.toLobby}>back to lobby</button>
       </div>
     );
   }

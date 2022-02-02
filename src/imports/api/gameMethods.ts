@@ -45,5 +45,26 @@ Meteor.methods({
     } else {
       throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
     }
+  },
+  'games.quit'(roomHash: string, gameId: string) {
+    GamesCollection.remove({ _id: gameId });
+
+    const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
+    if (rooms.length == 1) {
+      const roomId = rooms[0]._id;
+
+      RoomsCollection.update(
+        { _id: roomId },
+        {
+          $unset: {
+            gameId: gameId
+          }
+        }
+      );
+    } else if (rooms.length == 0) {
+      throw new Meteor.Error(`could not find room with id: ${roomHash}`);
+    } else {
+      throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
+    }
   }
 });
