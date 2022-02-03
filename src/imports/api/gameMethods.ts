@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { GamesCollection, Player } from '../db/games';
 import { RoomsCollection } from '../db/rooms';
 import { User } from '../db/users';
+import { findRoomAnd } from './roomMethods';
 
 function randomCard(): number {
   const cards = [2, 3, 4, 5, 6, 7, 8, 9];
@@ -15,20 +16,17 @@ Meteor.methods({
       throw new Meteor.Error('there must be at least one user to start a game');
     }
 
-    const players: Array<Player> = users.map((user) => ({
-      user: user,
-      card: randomCard()
-    }));
+    findRoomAnd(roomHash, (roomId) => {
+      const players: Array<Player> = users.map((user) => ({
+        user: user,
+        card: randomCard()
+      }));
 
-    const gameId: string = GamesCollection.insert({
-      createdAt: new Date(),
-      roomHash: roomHash,
-      players: players
-    });
-
-    const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
-    if (rooms.length == 1) {
-      const roomId = rooms[0]._id;
+      const gameId: string = GamesCollection.insert({
+        createdAt: new Date(),
+        roomHash: roomHash,
+        players: players
+      });
 
       RoomsCollection.update(
         { _id: roomId },
@@ -40,19 +38,12 @@ Meteor.methods({
       );
 
       return gameId;
-    } else if (rooms.length == 0) {
-      throw new Meteor.Error(`could not find room with id: ${roomHash}`);
-    } else {
-      throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
-    }
+    });
   },
   'games.quit'(roomHash: string, gameId: string) {
     GamesCollection.remove({ _id: gameId });
 
-    const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
-    if (rooms.length == 1) {
-      const roomId = rooms[0]._id;
-
+    findRoomAnd(roomHash, (roomId) => {
       RoomsCollection.update(
         { _id: roomId },
         {
@@ -61,10 +52,6 @@ Meteor.methods({
           }
         }
       );
-    } else if (rooms.length == 0) {
-      throw new Meteor.Error(`could not find room with id: ${roomHash}`);
-    } else {
-      throw new Meteor.Error(`found more than one room with id: ${roomHash}`);
-    }
+    });
   }
 });
