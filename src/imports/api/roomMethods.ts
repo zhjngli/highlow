@@ -12,8 +12,7 @@ function randomRoomHash(): string {
   return hash;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function findRoomAnd(roomHash: string, f: (roomId: string) => any) {
+export function findRoomAnd(roomHash: string, f: (roomId: string) => unknown) {
   const rooms = RoomsCollection.find({ hash: roomHash }).fetch();
   if (rooms.length == 1) {
     const roomId = <string>rooms[0]._id;
@@ -57,7 +56,7 @@ Meteor.methods({
     }
     console.log(`user when joining room: ${userId}, ${username}, ${roomHash}`);
 
-    findRoomAnd(roomHash, (roomId) => {
+    return findRoomAnd(roomHash, (roomId) => {
       UsersCollection.update({ _id: userId }, { $set: { username: username, roomHash: roomHash } });
       RoomsCollection.update(
         { _id: roomId },
