@@ -12,6 +12,6 @@ Meteor.publish('users', function publishUsers(roomHash: string) {
   return UsersCollection.find({ roomHash: roomHash });
 });
 
-Meteor.publish('games', function publishGames(roomHash: string) {
-  return GamesCollection.find({ roomHash: roomHash });
+Meteor.publish('games', function publishGames(gameId: string) {
+  return GamesCollection.find({ _id: gameId });
 });
