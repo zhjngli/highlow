@@ -3,7 +3,7 @@ import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 
 import { getUserId } from '/src/imports/api/session';
-import { GamesCollection, Player } from '/src/imports/db/games';
+import { GamesCollection, Perspective, Phase, Player } from '/src/imports/db/games';
 
 type GameProps = {
   roomHash: string;
@@ -13,6 +13,9 @@ type GameProps = {
 type GameTrackerProps = {
   players: Array<Player>;
   self: Player;
+  perspectives: Array<Perspective>;
+  phase: Phase;
+  turn: number;
 };
 
 type GameUIProps = GameProps & GameTrackerProps;
@@ -47,13 +50,47 @@ class GameUI extends React.Component<GameUIProps, GameState> {
     });
   }
 
+  renderHeadline(): React.ReactElement {
+    let headline;
+    if (this.props.phase == Phase.CountRanks) {
+      headline = 'Share perspectives!';
+    } else if (this.props.phase == Phase.Round1) {
+      headline = 'Round 1 guessing (Rank only)';
+    } else if (this.props.phase == Phase.Round2) {
+      headline = 'Round 2 guessing (Rank and Card)';
+    } else if (this.props.phase == Phase.Reveal) {
+      headline = 'Revealed all cards and rank';
+    } else {
+      throw new Error(`unrecognized phase ${this.props.phase}`);
+    }
+    return <h3>{headline}</h3>;
+  }
+
+  renderForm(): React.ReactElement {
+    if (this.props.phase == Phase.CountRanks) {
+      return <></>;
+    } else if (this.props.phase == Phase.Round1) {
+      return <></>;
+    } else if (this.props.phase == Phase.Round2) {
+      return <></>;
+    } else if (this.props.phase == Phase.Reveal) {
+      return <></>;
+    } else {
+      throw new Error(`unrecognized phase ${this.props.phase}`);
+    }
+  }
+
   render(): React.ReactElement {
     return (
       <div>
+        <div>
+          {this.renderHeadline()}
+          {this.renderForm()}
+        </div>
         <ul>
           {this.props.players.map(({ user, card, guess1, guess2 }) => {
             if (user._id == getUserId()) {
-              const c = this.state.revealed ? card : '?';
+              const c = this.props.phase == Phase.Reveal ? card : '?';
               return (
                 <li key={user._id}>
                   <p>You are holding {c}.</p>
@@ -88,13 +125,19 @@ export default withTracker(function (props: GameProps) {
   if (games.length == 1) {
     return {
       players: games[0].players,
-      self: games[0].players.filter(({ user }) => user._id == getUserId())[0]
+      self: games[0].players.filter(({ user }) => user._id == getUserId())[0],
+      perspectives: games[0].perspectives,
+      phase: games[0].phase,
+      turn: games[0].turn
     };
   } else {
     // too many games (shouldn't ever happen), or game doesn't exist
     return {
       players: [],
-      self: { user: { username: '', createdAt: new Date() }, card: 0 }
+      self: { user: { username: '', createdAt: new Date() }, card: 0 },
+      perspectives: [],
+      phase: Phase.CountRanks,
+      turn: 0
     };
   }
 })(GameUI);
