@@ -39,6 +39,7 @@ Meteor.methods({
       const gameId: string = GamesCollection.insert({
         createdAt: new Date(),
         roomHash: roomHash,
+        perspectives: [],
         players: players,
         phase: Phase.CountRanks,
         turn: 0

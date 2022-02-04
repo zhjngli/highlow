@@ -51,17 +51,26 @@ class GameUI extends React.Component<GameUIProps, GameState> {
     return (
       <div>
         <ul>
-          {this.props.players.map(({ user, card }) => (
-            <li key={user._id}>
-              {user.username} is holding {card}.
-            </li>
-          ))}
-          <hr />
-          {this.state.revealed && (
-            <li key={this.props.self.user._id}>
-              {this.props.self.user.username} is holding {this.props.self.card}.
-            </li>
-          )}
+          {this.props.players.map(({ user, card, guess1, guess2 }) => {
+            if (user._id == getUserId()) {
+              const c = this.state.revealed ? card : '?';
+              return (
+                <li key={user._id}>
+                  <p>You are holding {c}.</p>
+                  {guess1 && <p>You guessed rank {guess1} in round 1.</p>}
+                  {guess2 && <p>You guessed rank {guess2.rank} and card {guess2.card} in round 2.</p>}
+                </li>
+              );
+            } else {
+              return (
+                <li key={user._id}>
+                  <p>{user.username} is holding {card}.</p>
+                  {guess1 && <p>{user.username} guessed rank {guess1} in round 1.</p>}
+                  {guess2 && <p>{user.username} guessed rank {guess2.rank} and card {guess2.card} in round 2.</p>}
+                </li>
+              );
+            }
+          })}
         </ul>
         {!this.state.revealed && <button onClick={this.revealCard}>reveal card</button>}
         <button onClick={this.toLobby}>back to lobby</button>
@@ -78,7 +87,7 @@ export default withTracker(function (props: GameProps) {
 
   if (games.length == 1) {
     return {
-      players: games[0].players.filter(({ user }) => user._id != getUserId()),
+      players: games[0].players,
       self: games[0].players.filter(({ user }) => user._id == getUserId())[0]
     };
   } else {
