@@ -27,12 +27,12 @@ export enum Multiple {
 export type Multiples = {
   multiple: Multiple;
   count: number;
-}
+};
 
 export type Perspective = {
   player: Player;
   multiples: Array<Multiples>;
-}
+};
 
 export enum Phase {
   CountRanks,
@@ -43,11 +43,11 @@ export enum Phase {
 
 export type Guess1 = {
   rank: number;
-}
+};
 
 export type Guess2 = Guess1 & {
   card: Card;
-}
+};
 
 export interface Player {
   user: User;

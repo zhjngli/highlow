@@ -95,15 +95,29 @@ class GameUI extends React.Component<GameUIProps, GameState> {
                 <li key={user._id}>
                   <p>You are holding {c}.</p>
                   {guess1 && <p>You guessed rank {guess1} in round 1.</p>}
-                  {guess2 && <p>You guessed rank {guess2.rank} and card {guess2.card} in round 2.</p>}
+                  {guess2 && (
+                    <p>
+                      You guessed rank {guess2.rank} and card {guess2.card} in round 2.
+                    </p>
+                  )}
                 </li>
               );
             } else {
               return (
                 <li key={user._id}>
-                  <p>{user.username} is holding {card}.</p>
-                  {guess1 && <p>{user.username} guessed rank {guess1} in round 1.</p>}
-                  {guess2 && <p>{user.username} guessed rank {guess2.rank} and card {guess2.card} in round 2.</p>}
+                  <p>
+                    {user.username} is holding {card}.
+                  </p>
+                  {guess1 && (
+                    <p>
+                      {user.username} guessed rank {guess1} in round 1.
+                    </p>
+                  )}
+                  {guess2 && (
+                    <p>
+                      {user.username} guessed rank {guess2.rank} and card {guess2.card} in round 2.
+                    </p>
+                  )}
                 </li>
               );
             }

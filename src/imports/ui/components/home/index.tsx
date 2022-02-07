@@ -11,11 +11,11 @@ type HomeState = {
 };
 
 interface CreateRoomFormElements extends HTMLFormControlsCollection {
-  username: HTMLInputElement
+  username: HTMLInputElement;
 }
 
 interface CreateRoomForm extends HTMLFormElement {
- readonly elements: CreateRoomFormElements
+  readonly elements: CreateRoomFormElements;
 }
 
 interface JoinRoomFormElements extends HTMLFormControlsCollection {
@@ -24,7 +24,7 @@ interface JoinRoomFormElements extends HTMLFormControlsCollection {
 }
 
 interface JoinRoomForm extends HTMLFormElement {
- readonly elements: JoinRoomFormElements
+  readonly elements: JoinRoomFormElements;
 }
 
 class Home extends React.Component<HomeProps, HomeState> {
