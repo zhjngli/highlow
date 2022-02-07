@@ -1,6 +1,5 @@
-import $ from 'jquery';
 import { Meteor } from 'meteor/meteor';
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { getUserId } from '/src/imports/api/session';
@@ -11,8 +10,22 @@ type HomeState = {
   howToPlay: boolean;
 };
 
-const JOIN_ROOM_FORM = 'joinRoomForm';
-const CREATE_ROOM_FORM = 'createRoomForm';
+interface CreateRoomFormElements extends HTMLFormControlsCollection {
+  username: HTMLInputElement
+}
+
+interface CreateRoomForm extends HTMLFormElement {
+ readonly elements: CreateRoomFormElements
+}
+
+interface JoinRoomFormElements extends HTMLFormControlsCollection {
+  username: HTMLInputElement;
+  roomId: HTMLInputElement;
+}
+
+interface JoinRoomForm extends HTMLFormElement {
+ readonly elements: JoinRoomFormElements
+}
 
 class Home extends React.Component<HomeProps, HomeState> {
   constructor(props: RouteComponentProps) {
@@ -33,10 +46,10 @@ class Home extends React.Component<HomeProps, HomeState> {
     }));
   }
 
-  createRoom(e: SyntheticEvent): void {
+  createRoom(e: React.FormEvent<CreateRoomForm>): void {
     e.preventDefault();
 
-    const username = $(`form.${CREATE_ROOM_FORM}`).serializeArray()[0]['value'].trim();
+    const username = e.currentTarget.elements.username.value.trim();
     if (!username) {
       alert('need a username!');
       return;
@@ -51,17 +64,16 @@ class Home extends React.Component<HomeProps, HomeState> {
     });
   }
 
-  joinRoom(e: SyntheticEvent): void {
+  joinRoom(e: React.FormEvent<JoinRoomForm>): void {
     e.preventDefault();
-    const formData = $(`form.${JOIN_ROOM_FORM}`).serializeArray();
 
-    const username = formData[0]['value'].trim();
+    const username = e.currentTarget.elements.username.value.trim();
     if (!username) {
       alert('need a username!');
       return;
     }
 
-    const roomHash = formData[1]['value'].trim();
+    const roomHash = e.currentTarget.elements.roomId.value.trim();
     if (!roomHash) {
       alert('need a room id!');
       return;
@@ -93,16 +105,25 @@ class Home extends React.Component<HomeProps, HomeState> {
           {this.state.howToPlay && this.renderHowToPlay()}
         </p>
         <p>Create a room!</p>
-        <form className={CREATE_ROOM_FORM} onSubmit={this.createRoom}>
-          <input type="text" placeholder="choose a username" name="username" />
+        <form onSubmit={this.createRoom}>
+          <div>
+            <label htmlFor="username"></label>
+            <input id="username" type="text" placeholder="choose a username" name="username" />
+          </div>
 
           <button type="submit">Create room</button>
         </form>
         <hr />
         <p>or, join a room!</p>
-        <form className={JOIN_ROOM_FORM} onSubmit={this.joinRoom}>
-          <input type="text" placeholder="choose a username" name="username" />
-          <input type="text" placeholder="room id" name="roomId" />
+        <form onSubmit={this.joinRoom}>
+          <div>
+            <label htmlFor="username"></label>
+            <input id="username" type="text" placeholder="choose a username" name="username" />
+          </div>
+          <div>
+            <label htmlFor="roomId"></label>
+            <input id="roomId" type="text" placeholder="room id" name="roomId" />
+          </div>
 
           <button type="submit">Join room</button>
         </form>
