@@ -18,20 +18,11 @@ export enum Card {
   ACE
 }
 
-export enum Multiple {
-  Double,
-  Triple,
-  Quadruple
-}
-
-export type Multiples = {
-  multiple: Multiple;
-  count: number;
-};
-
 export type Perspective = {
   player: Player;
-  multiples: Array<Multiples>;
+  doubles: number;
+  triples: number;
+  quadruples: number;
 };
 
 export enum Phase {

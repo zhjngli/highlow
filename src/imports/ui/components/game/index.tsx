@@ -24,6 +24,16 @@ type GameState = {
   revealed: boolean;
 };
 
+interface SharePerspectiveFormElements extends HTMLFormControlsCollection {
+  double: HTMLInputElement;
+  triple: HTMLInputElement;
+  quadruple: HTMLInputElement;
+}
+
+interface SharePerspectiveForm extends HTMLFormElement {
+  readonly elements: SharePerspectiveFormElements;
+}
+
 class GameUI extends React.Component<GameUIProps, GameState> {
   constructor(props: GameUIProps) {
     super(props);
@@ -32,6 +42,7 @@ class GameUI extends React.Component<GameUIProps, GameState> {
 
     this.revealCard = this.revealCard.bind(this);
     this.toLobby = this.toLobby.bind(this);
+    this.sharePerspective = this.sharePerspective.bind(this);
   }
 
   revealCard(e: React.MouseEvent): void {
@@ -48,6 +59,36 @@ class GameUI extends React.Component<GameUIProps, GameState> {
         alert(err);
       }
     });
+  }
+
+  sharePerspective(e: React.FormEvent<SharePerspectiveForm>) {
+    e.preventDefault();
+
+    const doubleInp = e.currentTarget.elements.double.value.trim();
+    const tripleInp = e.currentTarget.elements.triple.value.trim();
+    const quadrupleInp = e.currentTarget.elements.quadruple.value.trim();
+    const double = doubleInp == '' ? 0 : parseInt(doubleInp);
+    const triple = tripleInp == '' ? 0 : parseInt(tripleInp);
+    const quadruple = quadrupleInp == '' ? 0 : parseInt(quadrupleInp);
+
+    if (isNaN(double) || isNaN(triple) || isNaN(quadruple)) {
+      alert('input must be numbers only!');
+      return;
+    }
+
+    Meteor.call(
+      'games.sharePerspective',
+      this.props.gameId,
+      getUserId(),
+      double,
+      triple,
+      quadruple,
+      (err: Meteor.Error, _: string) => {
+        if (err) {
+          alert(err);
+        }
+      }
+    );
   }
 
   renderHeadline(): React.ReactElement {
@@ -68,7 +109,42 @@ class GameUI extends React.Component<GameUIProps, GameState> {
 
   renderForm(): React.ReactElement {
     if (this.props.phase == Phase.CountRanks) {
-      return <></>;
+      return (
+        <div>
+          <ul>
+            {this.props.perspectives.map(({ player, doubles, triples, quadruples }) => {
+              let nameSees;
+              if (player.user._id == getUserId()) {
+                nameSees = 'You see';
+              } else {
+                nameSees = `${player.user.username} sees`;
+              }
+              const multiples = `${doubles} doubles, ${triples} triples, ${quadruples} quadruples`;
+              return (
+                <li key={player.user._id}>
+                  {nameSees} {multiples}
+                </li>
+              );
+            })}
+          </ul>
+          <hr />
+          <form onSubmit={this.sharePerspective}>
+            <div>
+              <label htmlFor="double"></label>
+              <input id="double" type="number" placeholder="how many doubles do you see?" name="double" />
+            </div>
+            <div>
+              <label htmlFor="triple"></label>
+              <input id="triple" type="number" placeholder="how many triples do you see?" name="triple" />
+            </div>
+            <div>
+              <label htmlFor="quadruple"></label>
+              <input id="quadruple" type="number" placeholder="how many quadruples do you see?" name="quadruples" />
+            </div>
+            <button type="submit">share</button>
+          </form>
+        </div>
+      );
     } else if (this.props.phase == Phase.Round1) {
       return <></>;
     } else if (this.props.phase == Phase.Round2) {
