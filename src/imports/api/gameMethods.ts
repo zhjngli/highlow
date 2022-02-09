@@ -126,5 +126,59 @@ Meteor.methods({
         }
       );
     });
+  },
+  'games.finishShare'(gameId: string) {
+    GamesCollection.update({ _id: gameId }, { $set: { phase: Phase.Round1 } });
+  },
+  'games.guess1'(gameId: string, userId: string, rank: number) {
+    findGameAnd(gameId, (game) => {
+      const player = game.players[game.turn];
+      if (player.user._id != userId) {
+        throw new Meteor.Error('Out of turn to guess!');
+      }
+      let nextTurn = game.turn + 1;
+      let nextPhase = false;
+      if (nextTurn >= game.players.length) {
+        nextTurn = 0;
+        nextPhase = true;
+      }
+      GamesCollection.update(
+        { _id: gameId },
+        {
+          $set: {
+            ['players.' + game.turn + '.guess1']: { rank },
+            phase: nextPhase ? Phase.Round2 : Phase.Round1,
+            turn: nextTurn
+          }
+        }
+      );
+    });
+  },
+  'games.guess2'(gameId: string, userId: string, rank: number, card: number) {
+    findGameAnd(gameId, (game) => {
+      const player = game.players[game.turn];
+      if (player.user._id != userId) {
+        throw new Meteor.Error('Out of turn to guess!');
+      }
+      let nextTurn = game.turn + 1;
+      let nextPhase = false;
+      if (nextTurn >= game.players.length) {
+        nextTurn = 0;
+        nextPhase = true;
+      }
+      GamesCollection.update(
+        { _id: gameId },
+        {
+          $set: {
+            ['players.' + game.turn + '.guess2']: { rank, card },
+            phase: nextPhase ? Phase.Revealable : Phase.Round2,
+            turn: nextTurn
+          }
+        }
+      );
+    });
+  },
+  'games.reveal'(gameId: string) {
+    GamesCollection.update({ _id: gameId }, { $set: { phase: Phase.Revealed } });
   }
 });

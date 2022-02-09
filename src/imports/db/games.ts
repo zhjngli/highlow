@@ -29,7 +29,8 @@ export enum Phase {
   CountRanks,
   Round1,
   Round2,
-  Reveal
+  Revealable,
+  Revealed
 }
 
 export type Guess1 = {
