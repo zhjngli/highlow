@@ -3,7 +3,7 @@ import { withTracker } from 'meteor/react-meteor-data';
 import React from 'react';
 
 import { getUserId } from '/src/imports/api/session';
-import { GamesCollection, Perspective, Phase, Player } from '/src/imports/db/games';
+import { Card, GamesCollection, Perspective, Phase, Player } from '/src/imports/db/games';
 
 type GameProps = {
   roomHash: string;
@@ -44,6 +44,52 @@ interface Guess2FormElements extends Guess1FormElements {
 
 interface Guess2Form extends HTMLFormElement {
   readonly elements: Guess2FormElements;
+}
+
+function cardFromString(s: string): Card {
+  switch (s.toLowerCase()) {
+    case '2':
+    case 'two':
+      return Card.TWO;
+    case '3':
+    case 'three':
+      return Card.THREE;
+    case '4':
+    case 'four':
+      return Card.FOUR;
+    case '5':
+    case 'five':
+      return Card.FIVE;
+    case '6':
+    case 'six':
+      return Card.SIX;
+    case '7':
+    case 'seven':
+      return Card.SEVEN;
+    case '8':
+    case 'eight':
+      return Card.EIGHT;
+    case '9':
+    case 'nine':
+      return Card.NINE;
+    case '10':
+    case 'ten':
+      return Card.TEN;
+    case '11':
+    case 'jack':
+      return Card.JACK;
+    case '12':
+    case 'queen':
+      return Card.QUEEN;
+    case '13':
+    case 'king':
+      return Card.KING;
+    case '14':
+    case 'ace':
+      return Card.ACE;
+    default:
+      throw new Error('unrecognized card string');
+  }
 }
 
 class GameUI extends React.Component<GameUIProps> {
@@ -121,7 +167,15 @@ class GameUI extends React.Component<GameUIProps> {
     e.preventDefault();
 
     const rank = e.currentTarget.elements.rank.value.trim();
-    const card = e.currentTarget.elements.card.value.trim();
+    const cardStr = e.currentTarget.elements.card.value.trim();
+    let card;
+    try {
+      card = cardFromString(cardStr);
+    } catch (e) {
+      alert(`${cardStr} is an invalid card`);
+      return;
+    }
+
     Meteor.call('games.guess2', this.props.gameId, getUserId(), rank, card, (err: Meteor.Error, _: string) => {
       if (err) {
         alert(err);
@@ -162,12 +216,7 @@ class GameUI extends React.Component<GameUIProps> {
         <div>
           <ul>
             {this.props.perspectives.map(({ player, doubles, triples, quadruples }) => {
-              let nameSees;
-              if (player.user._id == getUserId()) {
-                nameSees = 'You see';
-              } else {
-                nameSees = `${player.user.username} sees`;
-              }
+              const nameSees = player.user._id == getUserId() ? 'You see' : `${player.user.username} sees`;
               const multiples = `${doubles} doubles, ${triples} triples, ${quadruples} quadruples`;
               return (
                 <li key={player.user._id}>
@@ -221,7 +270,7 @@ class GameUI extends React.Component<GameUIProps> {
               </div>
               <div>
                 <label htmlFor="card"></label>
-                <input id="card" type="number" placeholder="what card are you?" name="card" />
+                <input id="card" type="text" placeholder="what card are you?" name="card" />
               </div>
               <button type="submit">guess rank and card</button>
             </form>
@@ -247,38 +296,27 @@ class GameUI extends React.Component<GameUIProps> {
         </div>
         <ul>
           {this.props.players.map(({ user, card, guess1, guess2 }) => {
-            if (user._id == getUserId()) {
-              const c = this.props.phase == Phase.Revealed ? card : '?';
-              return (
-                <li key={user._id}>
-                  <p>You are holding {c}.</p>
-                  {guess1 && <p>You guessed rank {guess1.rank} in round 1.</p>}
-                  {guess2 && (
-                    <p>
-                      You guessed rank {guess2.rank} and card {guess2.card} in round 2.
-                    </p>
-                  )}
-                </li>
-              );
-            } else {
-              return (
-                <li key={user._id}>
+            const isCurrentUser = user._id == getUserId();
+            const username = isCurrentUser ? 'You' : user.username;
+            const conjugate = isCurrentUser ? 'are' : 'is';
+            const c = isCurrentUser && this.props.phase != Phase.Revealed ? '?' : Card[card];
+            return (
+              <li key={user._id}>
+                <p>
+                  {username} {conjugate} holding {c}.
+                </p>
+                {guess1 && (
                   <p>
-                    {user.username} is holding {card}.
+                    Round one: {username} guessed rank {guess1.rank}.
                   </p>
-                  {guess1 && (
-                    <p>
-                      {user.username} guessed rank {guess1} in round 1.
-                    </p>
-                  )}
-                  {guess2 && (
-                    <p>
-                      {user.username} guessed rank {guess2.rank} and card {guess2.card} in round 2.
-                    </p>
-                  )}
-                </li>
-              );
-            }
+                )}
+                {guess2 && (
+                  <p>
+                    Round two: {username} guessed rank {guess2.rank} and card {Card[guess2.card]}.
+                  </p>
+                )}
+              </li>
+            );
           })}
         </ul>
         <button onClick={this.toLobby}>back to lobby</button>

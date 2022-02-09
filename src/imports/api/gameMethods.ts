@@ -6,11 +6,6 @@ import { RoomsCollection } from '../db/rooms';
 import { User } from '../db/users';
 import { findRoomAnd } from './roomMethods';
 
-function randomCard(): number {
-  const cards = [2, 3, 4, 5, 6, 7, 8, 9];
-  return cards[Math.floor(Math.random() * cards.length)];
-}
-
 function shuffle<T>(arr: Array<T>): Array<T> {
   let i = arr.length;
   let j;
@@ -22,6 +17,31 @@ function shuffle<T>(arr: Array<T>): Array<T> {
   }
 
   return arr;
+}
+
+function createDeck(): Array<Card> {
+  const suit = [
+    Card.TWO,
+    Card.THREE,
+    Card.FOUR,
+    Card.FIVE,
+    Card.SIX,
+    Card.SEVEN,
+    Card.EIGHT,
+    Card.NINE,
+    Card.TEN,
+    Card.JACK,
+    Card.QUEEN,
+    Card.KING,
+    Card.ACE
+  ];
+  const deck = [];
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < suit.length; j++) {
+      deck.push(suit[j]);
+    }
+  }
+  return shuffle(deck);
 }
 
 export function findGameAnd(gameId: string, f: (game: Game) => unknown) {
@@ -41,11 +61,15 @@ Meteor.methods({
     if (!users || users.length == 0) {
       throw new Meteor.Error('there must be at least one user to start a game');
     }
+    if (users.length > 52) {
+      throw new Meteor.Error('too many users');
+    }
 
     return findRoomAnd(roomHash, (roomId) => {
+      const deck = createDeck();
       let players: Array<Player> = users.map((user) => ({
         user: user,
-        card: randomCard()
+        card: <Card>deck.pop()
       }));
       players = shuffle(players);
 
@@ -154,7 +178,7 @@ Meteor.methods({
       );
     });
   },
-  'games.guess2'(gameId: string, userId: string, rank: number, card: number) {
+  'games.guess2'(gameId: string, userId: string, rank: number, card: Card) {
     findGameAnd(gameId, (game) => {
       const player = game.players[game.turn];
       if (player.user._id != userId) {
