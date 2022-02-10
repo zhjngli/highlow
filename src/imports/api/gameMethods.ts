@@ -44,7 +44,7 @@ function createDeck(): Array<Card> {
   return shuffle(deck);
 }
 
-export function findGameAnd(gameId: string, f: (game: Game) => unknown) {
+function findGameAnd(gameId: string, f: (game: Game) => unknown) {
   const games = GamesCollection.find({ _id: gameId }).fetch();
   if (games.length == 1) {
     const game = <Game>games[0];

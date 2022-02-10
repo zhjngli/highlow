@@ -252,6 +252,7 @@ class GameUI extends React.Component<GameUIProps> {
       if (this.props.players[this.props.turn].user._id == getUserId()) {
         return (
           <div>
+            <h4>Your turn to guess rank!</h4>
             <form onSubmit={this.guess1}>
               <div>
                 <label htmlFor="rank"></label>
@@ -262,11 +263,12 @@ class GameUI extends React.Component<GameUIProps> {
           </div>
         );
       }
-      return <></>;
+      return <h4>{this.props.players[this.props.turn].user.username}&apos;s turn to guess rank</h4>;
     } else if (this.props.phase == Phase.Round2) {
       if (this.props.players[this.props.turn].user._id == getUserId()) {
         return (
           <div>
+            <h4>Your turn to guess rank and card!</h4>
             <form onSubmit={this.guess2}>
               <div>
                 <label htmlFor="rank"></label>
@@ -281,7 +283,7 @@ class GameUI extends React.Component<GameUIProps> {
           </div>
         );
       }
-      return <></>;
+      return <h4>{this.props.players[this.props.turn].user.username}&apos;s turn to guess rank and card</h4>;
     } else if (this.props.phase == Phase.Revealable) {
       return <button onClick={this.reveal}>reveal</button>;
     } else if (this.props.phase == Phase.Revealed) {
