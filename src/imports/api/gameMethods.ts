@@ -74,8 +74,6 @@ Meteor.methods({
       const ranks: Array<Card> = [...new Set(cards)];
       ranks.sort();
       ranks.reverse();
-      console.log('ranks: ' + ranks);
-      console.log('cards: ' + cards);
 
       let players: Array<Player> = users.map((user, i) => ({
         user: user,
