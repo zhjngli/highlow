@@ -67,9 +67,20 @@ Meteor.methods({
 
     return findRoomAnd(roomHash, (roomId) => {
       const deck = createDeck();
-      let players: Array<Player> = users.map((user) => ({
+      const cards: Array<Card> = [];
+      for (let i = 0; i < users.length; i++) {
+        cards.push(<Card>deck.pop());
+      }
+      const ranks: Array<Card> = [...new Set(cards)];
+      ranks.sort();
+      ranks.reverse();
+      console.log('ranks: ' + ranks);
+      console.log('cards: ' + cards);
+
+      let players: Array<Player> = users.map((user, i) => ({
         user: user,
-        card: <Card>deck.pop()
+        rank: ranks.indexOf(cards[i]) + 1,
+        card: cards[i]
       }));
       players = shuffle(players);
 

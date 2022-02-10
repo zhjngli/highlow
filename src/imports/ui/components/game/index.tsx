@@ -77,15 +77,19 @@ function cardFromString(s: string): Card {
       return Card.TEN;
     case '11':
     case 'jack':
+    case 'j':
       return Card.JACK;
     case '12':
     case 'queen':
+    case 'q':
       return Card.QUEEN;
     case '13':
     case 'king':
+    case 'k':
       return Card.KING;
     case '14':
     case 'ace':
+    case 'a':
       return Card.ACE;
     default:
       throw new Error('unrecognized card string');
@@ -295,15 +299,16 @@ class GameUI extends React.Component<GameUIProps> {
           {this.renderForm()}
         </div>
         <ul>
-          {this.props.players.map(({ user, card, guess1, guess2 }) => {
+          {this.props.players.map(({ user, rank, card, guess1, guess2 }) => {
             const isCurrentUser = user._id == getUserId();
             const username = isCurrentUser ? 'You' : user.username;
             const conjugate = isCurrentUser ? 'are' : 'is';
             const c = isCurrentUser && this.props.phase != Phase.Revealed ? '?' : Card[card];
+            const r = this.props.phase != Phase.Revealed ? '?' : rank;
             return (
               <li key={user._id}>
                 <p>
-                  {username} {conjugate} holding {c}.
+                  {username} {conjugate} holding {c}, with rank {r}.
                 </p>
                 {guess1 && (
                   <p>
@@ -343,7 +348,7 @@ export default withTracker(function (props: GameProps) {
     // too many games (shouldn't ever happen), or game doesn't exist
     return {
       players: [],
-      self: { user: { username: '', createdAt: new Date() }, card: 0 },
+      self: { user: { username: '', createdAt: new Date() }, rank: 0, card: 0 },
       perspectives: [],
       phase: Phase.CountRanks,
       turn: 0

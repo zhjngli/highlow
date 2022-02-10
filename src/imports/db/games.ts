@@ -43,6 +43,7 @@ export type Guess2 = Guess1 & {
 
 export interface Player {
   user: User;
+  rank: number;
   card: Card;
   guess1?: Guess1;
   guess2?: Guess2;
